@@ -1,0 +1,50 @@
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int main(int argc,char* argv[])
+{
+FILE *fp;
+int sd,len,k,tsp;
+char buf[100],a[100],b[100];
+struct sockaddr_in server,client;
+sd=socket(AF_INET,SOCK_STREAM,0);
+if(sd==-1)
+printf("Error in socket creation\n");
+else
+printf("Socket creation successfull\n");
+server.sin_family=AF_INET;
+server.sin_addr.s_addr=INADDR_ANY;
+server.sin_port=htons(atoi(argv[2]));
+k=connect(sd,(struct sockaddr*)&server,sizeof(server));
+if(k==-1)
+printf("Error in connecting\n");
+printf("Enter the exsisting file's name:");
+scanf("%s",a);
+printf("Enter the new file's name:");
+scanf("%s",b);
+fp=fopen(b,"w");
+send(sd,a,strlen(a),0);
+if(k==-1)
+printf("Error in sending");
+k=recv(sd,buf,100,0);
+if(k==-1)
+printf("Error in receiving\n");
+else if(strcmp(buf,"error")==0)
+printf("Such a file doesnt exsists\n");
+else
+{
+fputs(buf,stdout);
+fprintf(fp,"%s",buf);
+k=recv(sd,buf,100,0);
+if(strcmp(buf,"complete")==0)
+printf("File transfer completed");
+
+}
+close(tsp);
+}
