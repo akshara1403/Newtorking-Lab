@@ -1,0 +1,75 @@
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main(int argc,char* argv[])
+{
+int sd,len,k;
+char b[100],s[50];
+char msg[1024]={0};
+if(argc!=3)
+printf("Invalid input format");
+struct sockaddr_in server,client;
+sd=socket(AF_INET,SOCK_STREAM,0);
+if(sd==-1)
+printf("Error in socket creation\n");
+else
+printf("Created succcessfully\n");
+server.sin_family=AF_INET;
+server.sin_addr.s_addr=INADDR_ANY;
+server.sin_port=htons(atoi(argv[2]));
+k=connect(sd,(struct sockaddr*)&server,sizeof(server));
+if(k==-1)
+printf("Error in connecting\n");
+else
+printf("Connected succcessfully\n");
+//sending hi
+
+k=send(sd,"hi",100,0);
+if(k==-1)
+printf("Error in sending");
+//print 220
+k=recv(sd,b,100,0);
+if(strcmp(b,"220")==0)
+printf("220 from server\n");
+//sending hello
+strcpy(b,"hello");
+k=send(sd,b,100,0);
+if(k==-1)
+printf("Error in sending");
+//print 250
+k=recv(sd,b,100,0);
+if(strcmp(b,"250")==0)
+printf("250 from server\n");
+//sending to adress
+printf("Enter the sender mail adress:");
+scanf("%s",s);
+sprintf(b,"The sender address is: %s",s);
+k=send(sd,b,100,0);
+if(k==-1)
+printf("Error in sending");
+////sending from adress
+printf("Enter the receipient address:");
+scanf("%s",s);
+sprintf(b,"The receipient address is: %s",s);
+k=send(sd,b,100,0);
+if(k==-1)
+printf("Error in sending");
+//message body
+printf("Message body\n");
+while(fgets(b,100,stdin)!=NULL)
+{
+strcat(msg,b);
+}
+k=send(sd,msg,100,0);
+if(k==-1)
+printf("Error in sending");
+close(sd);
+}
+
+
