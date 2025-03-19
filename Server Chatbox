@@ -1,0 +1,54 @@
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+void chatserver(int tsp)
+{
+int k;
+char b[100];
+printf("Enter bye whenever you wish to end the chat\n");
+while(1)
+{
+k=recv(tsp,b,100,0);
+if(k==-1)
+printf("Error in receiving");
+printf("\nThe message received from server is: %s",b);
+if(strcmp(b,"bye\n")==0)
+break;
+printf("\tEnter the message sent to client");
+fgets(b,100,stdin);
+k=send(tsp,b,100,0);
+if(k==-1)
+printf("Error in sending");
+}
+}
+
+int main()
+{
+int sd,len,k,tsp,port;
+struct sockaddr_in server,client;
+printf("Enter the port address");
+scanf("%d",&port);
+sd=socket(AF_INET,SOCK_STREAM,0);
+if(sd==-1)
+printf("Error in socket creation");
+server.sin_family=AF_INET;
+server.sin_addr.s_addr=INADDR_ANY;
+server.sin_port=htons(port);
+k=bind(sd,(struct sockaddr*)&server,sizeof(server));
+if(k==-1)
+printf("Error in binding");
+k=listen(sd,5);
+if(k==-1)
+printf("Error in listening");
+len=sizeof(client);
+tsp=accept(sd,(struct sockaddr*)&client,&len);
+if(tsp==-1)
+printf("Error in temporary socket creation");
+chatserver(tsp);
+close(tsp);
+}
