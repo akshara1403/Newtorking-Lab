@@ -1,0 +1,81 @@
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main(int argc,char *argv[])
+{
+int sd,len,k,tsp;
+char b[100];
+struct sockaddr_in server,client;
+sd=socket(AF_INET,SOCK_STREAM,0);
+if(sd==-1)
+printf("Error in socket creation");
+else
+printf("Created successfully\n");
+server.sin_family=AF_INET;
+server.sin_addr.s_addr=INADDR_ANY;
+server.sin_port=htons(atoi(argv[1]));
+len=sizeof(client);
+k=bind(sd,(struct sockaddr*)&server,sizeof(server));
+if(k==-1)
+printf("Error in binding");
+k=listen(sd,5);
+if(k==-1)
+printf("Error in listening");
+tsp=accept(sd,(struct sockaddr*)&client,&len);
+if(tsp==-1)
+printf("Error in temporary socket creation");
+else
+printf("Temporary socket created successfully\n");
+//print hi
+k=recv(tsp,b,100,0);
+if(k==-1)
+printf("Error in receiving");
+//sending 220
+else if(strcmp(b,"hi")==0)
+{
+printf("Hi from client\n");
+strcpy(b,"220");
+k=send(tsp,b,100,0);
+if(k==-1)
+printf("Error in sending");
+}
+//receive hello
+k=recv(tsp,b,100,0);
+if(k==-1)
+printf("Error in receiving");
+//send 250
+else if(strcmp(b,"hello")==0)
+{
+printf("Hello from client\n");
+strcpy(b,"250");
+k=send(tsp,b,100,0);
+if(k==-1)
+printf("Error in sending");
+}
+//receive to adress
+k=recv(tsp,b,100,0);
+if(k==-1)
+printf("Error in sending");
+else if(strstr(b,"sender")!=NULL)
+printf("%s\n",b);
+//receive from adress
+k=recv(tsp,b,100,0);
+if(k==-1)
+printf("Error in sending");
+else if(strstr(b,"receipient")!=NULL)
+printf("%s\n",b);
+//receive meassage 
+printf("Message body\n");
+k=recv(tsp,b,100,0);
+if(k==-1)
+printf("Error in sending");
+else
+printf("%s",b);
+close(tsp);
+}
