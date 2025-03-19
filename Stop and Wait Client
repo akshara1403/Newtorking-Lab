@@ -1,0 +1,47 @@
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main()
+{
+int sd,len,k,tsp,i;
+char ack[100];
+char packet[3][100]={"A","B","C"};
+struct sockaddr_in server,client;
+sd=socket(AF_INET,SOCK_STREAM,0);
+if(sd==-1)
+printf("Error in socket creation");
+server.sin_family=AF_INET;
+server.sin_addr.s_addr=INADDR_ANY;
+server.sin_port=htons(9598);
+k=connect(sd,(struct sockaddr*)&server,sizeof(server));
+if(k==-1)
+printf("Error in connecting");
+for(i=0;i<3;i++)
+{
+printf("Sending packet %d",(i+1));
+k=send(sd,packet[i],100,0);
+if(k==-1)
+printf("Error in sending");
+while(1)
+{
+k=recv(sd,ack,100,0);
+
+if(strcmp(ack,"1\n")==0)
+break;
+else
+{
+k=send(sd,packet[i],100,0);
+if(k==-1)
+printf("Error in sending");
+printf("Resending packet %d\n",i+1);
+}
+}
+}
+close(sd);
+}
