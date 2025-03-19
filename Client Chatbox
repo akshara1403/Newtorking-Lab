@@ -1,0 +1,48 @@
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+int chatclient(int sd)
+{
+int k;
+char b[100];
+printf("Enter bye to exit the chat\n");
+while(1)
+{
+printf("\nMessage sent to server:");
+fgets(b,100,stdin);
+k=send(sd,b,100,0);
+if(k==-1)
+printf("Error in sending");
+k=recv(sd,b,100,0);
+if(k==-1)
+printf("Error in receiving");
+printf("\tThe message received from server is: %s",b);
+if(strcmp(b,"bye\n")==0)
+break;
+}
+}
+
+int main()
+{
+int sd,len,k,t,port;
+struct sockaddr_in server,client;
+printf("Enter the port address");
+scanf("%d",&port);
+sd=socket(AF_INET,SOCK_STREAM,0);
+if(sd==-1)
+printf("Error in socket creation");
+server.sin_family=AF_INET;
+server.sin_addr.s_addr=INADDR_ANY;
+server.sin_port=htons(port);
+k=connect(sd,(struct sockaddr*)&server,sizeof(server));
+if(k==-1)
+printf("Error in connecting");
+chatclient(sd);
+close(sd);
+}
