@@ -1,0 +1,45 @@
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int main(int argc,char *argv[])
+{
+int sd,len,k,i;
+char b[100],ack[100];
+struct sockaddr_in server,client;
+if(argc!=2)
+printf("Invalid input format");
+sd=socket(AF_INET,SOCK_DGRAM,0);
+if(sd==-1)
+printf("Error in socket creation");
+server.sin_family=AF_INET;
+server.sin_addr.s_addr=INADDR_ANY;
+server.sin_port=htons(atoi(argv[1]));
+k=bind(sd,(struct sockaddr*)&server,sizeof(server));
+if(k==-1)
+printf("Error in binding");
+len=sizeof(client);
+for(i=0;i<3;i++)
+{
+k=recvfrom(sd,b,100,0,(struct sockaddr*)&client,&len);
+while(1)
+{
+printf("Packet %d received or not",(i+1));
+scanf("%s",ack);
+k=sendto(sd,ack,100,0,(struct sockaddr*)&client,sizeof(client));
+if(strcmp(ack,"1")==0)
+break;
+else
+{
+printf("Waiting for the packet to be resented\n");
+k=recvfrom(sd,b,100,0,(struct sockaddr*)&client,&len);
+}
+}
+}
+close(sd);
+}
