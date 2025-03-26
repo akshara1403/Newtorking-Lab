@@ -1,0 +1,85 @@
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int main(int argc,char* argv[])
+{
+
+int sd,k,len;
+char b[100],a[20];
+char buf[1024]={0};
+struct sockaddr_in server,client;
+if(argc!=3)
+printf("Invalid input format\n");
+sd=socket(AF_INET,SOCK_DGRAM,0);
+if(sd==-1)
+printf("Error in socket creation\n");
+else
+printf("Socket created successfully\n");
+server.sin_family=AF_INET;
+server.sin_addr.s_addr=INADDR_ANY;
+server.sin_port=htons(atoi(argv[2]));
+len=sizeof(server);
+//hi send
+k=sendto(sd,"hi",5,0,(struct sockaddr*)&server,sizeof(server));
+if(k==-1)
+printf("Error in sending\n");
+//220 receive
+k=recvfrom(sd,b,100,0,(struct sockaddr*)&server,&len);
+if(strcmp(b,"220")==0)
+printf("220 from client\n");
+//hello send
+k=sendto(sd,"hello",5,0,(struct sockaddr*)&server,sizeof(server));
+if(k==-1)
+printf("Error in sending\n");
+//250 receive
+k=recvfrom(sd,b,100,0,(struct sockaddr*)&server,&len);
+if(strcmp(b,"250")==0)
+printf("250 from client\n");
+//to send
+printf("Enter the sender adrress:");
+scanf("%s",a);
+sprintf(b,"The sender adrress: %s",a);
+k=sendto(sd,b,100,0,(struct sockaddr*)&server,sizeof(server));
+//250 receive
+k=recvfrom(sd,b,100,0,(struct sockaddr*)&server,&len);
+if(strcmp(b,"250")==0)
+printf("250 from client\n");
+//from send
+printf("Enter the receipient adrress:");
+scanf("%s",a);
+sprintf(b,"The receipient adrress: %s",a);
+k=sendto(sd,b,100,0,(struct sockaddr*)&server,sizeof(server));
+//250 receive
+k=recvfrom(sd,b,100,0,(struct sockaddr*)&server,&len);
+if(strcmp(b,"250")==0)
+printf("250 from client\n");
+//mailbody msg send
+k=sendto(sd,"MAILBODY",50,0,(struct sockaddr*)&server,sizeof(server));
+//354 receive
+k=recvfrom(sd,b,100,0,(struct sockaddr*)&server,&len);
+if(strcmp(b,"354")==0)
+printf("354 from server\nEnter the mail body:\n");
+while(fgets(b,100,stdin)!=NULL)
+{
+strcat(buf,b);
+}
+//mailbody send
+k=sendto(sd,buf,sizeof(buf),0,(struct sockaddr*)&server,sizeof(server));
+//250 receive
+k=recvfrom(sd,b,100,0,(struct sockaddr*)&server,&len);
+if(strcmp(b,"250")==0)
+printf("250 from client\n");
+//quit send
+k=sendto(sd,"Quit",10,0,(struct sockaddr*)&server,sizeof(server));
+//221 receive
+k=recvfrom(sd,b,100,0,(struct sockaddr*)&server,&len);
+if(strcmp(b,"221")==0)
+printf("221 Quit from server\n");
+close(sd);
+}
