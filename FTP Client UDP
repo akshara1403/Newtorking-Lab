@@ -1,0 +1,45 @@
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int main(int argc,char* argv[])
+{
+FILE *fp;
+int sd,k,len;
+char buf[100],a[20],b[20];
+char out[1024]={0};
+struct sockaddr_in server,client;
+if(argc!=3)
+printf("Invalid input format\n");
+sd=socket(AF_INET,SOCK_DGRAM,0);
+if(sd==-1)
+printf("Error in socket creation\n");
+else
+printf("Socket created successfully\n");
+server.sin_family=AF_INET;
+server.sin_addr.s_addr=INADDR_ANY;
+server.sin_port=htons(atoi(argv[2]));
+len=sizeof(server);
+printf("Enter the exsisting file's name:");
+scanf("%s",a);
+printf("Enter the new file's name:");
+scanf("%s",b);
+fp=fopen(b,"w");
+k=sendto(sd,a,20,0,(struct sockaddr*)&server,sizeof(server));
+if(k==-1)
+printf("Error in sending\n");
+k=recvfrom(sd,buf,100,0,(struct sockaddr*)&server,&len);
+if(k==-1)
+printf("Error in receiving\n");
+else
+{
+printf("%s",buf);
+fprintf(fp,"%s",buf);
+}
+close(sd);
+}
