@@ -1,0 +1,30 @@
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int main()
+{
+int sd,len,k,tsp;
+char b[100];
+struct sockaddr_in server,client;
+sd=socket(AF_INET,SOCK_STREAM,0);
+if(sd==-1)
+printf("Error in socket creation\n");
+server.sin_family=AF_INET;
+server.sin_addr.s_addr=INADDR_ANY;
+server.sin_port=htons(8987);
+k=connect(sd,(struct sockaddr*)&server,sizeof(server));
+if(k==-1)
+printf("Error in connection\n");
+printf("Enter the number upto which you want to find:");
+fgets(b,100,stdin);
+k=send(sd,b,100,0);
+if(k==-1)
+printf("Error in sending\n");
+close(sd);
+}
