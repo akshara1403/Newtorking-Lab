@@ -22,6 +22,7 @@ k=bind(sd,(struct sockaddr*)&server,sizeof(server));
 if(k==-1)
 printf("Error in binding\n");
 k=listen(sd,5);
+if(k==-1)
 printf("Error in listening\n");
 len=sizeof(client);
 tsp=accept(sd,(struct sockaddr*)&client,&len);
